@@ -2,6 +2,11 @@
 In this file, you will implement generic search algorithms which are called by Pacman agents.
 """
 
+from pacai.util.queue import Queue
+from pacai.util.stack import Stack
+from pacai.util.priorityQueue import PriorityQueue
+from pacai.core.search.heuristic import manhattan
+
 def depthFirstSearch(problem):
     """
     Search the deepest nodes in the search tree first [p 85].
@@ -21,12 +26,13 @@ def depthFirstSearch(problem):
     # *** Your Code Here ***
     initial_node = (problem.startingState(), "Stop", 0)
     node = initial_node
-    frontier = [node]
+    frontier = Stack()
+    frontier.push(node)
     reached = {problem.startingState(): node}
     parents = {node: None}
 
-    while len(frontier) != 0:
-        node = frontier.pop(-1)
+    while not frontier.isEmpty():
+        node = frontier.pop()
         state, action, cost = node
         if problem.isGoal(state):
             output = [action]
@@ -44,7 +50,7 @@ def depthFirstSearch(problem):
                 x, y, old_cost = reached[s]
             if s not in reached or c < old_cost:
                 reached[s] = child
-                frontier.append(child)
+                frontier.push(child)
                 parents[child] = node
     return None
 
@@ -56,12 +62,13 @@ def breadthFirstSearch(problem):
     # *** Your Code Here ***
     initial_node = (problem.startingState(), "Stop", 0)
     node = initial_node
-    frontier = [node]
+    frontier = Queue()
+    frontier.push(node)
     reached = {problem.startingState(): node}
     parents = {node: None}
 
-    while len(frontier) != 0:
-        node = frontier.pop(0)
+    while not frontier.isEmpty():
+        node = frontier.pop()
         state, action, cost = node
         if problem.isGoal(state):
             output = [action]
@@ -79,7 +86,7 @@ def breadthFirstSearch(problem):
                 x, y, old_cost = reached[s]
             if s not in reached or c < old_cost:
                 reached[s] = child
-                frontier.append(child)
+                frontier.push(child)
                 parents[child] = node
     return None
 
@@ -89,7 +96,35 @@ def uniformCostSearch(problem):
     """
 
     # *** Your Code Here ***
-    raise NotImplementedError()
+    initial_node = (problem.startingState(), "Stop", 0)
+    node = initial_node
+    frontier = PriorityQueue()
+    frontier.push(node, 0)
+    reached = {problem.startingState(): node}
+    parents = {node: None}
+
+    while not frontier.isEmpty():
+        node = frontier.pop()
+        state, action, cost = node
+        if problem.isGoal(state):
+            output = [action]
+            current = node
+            while parents[current] is not None:
+                state, action, cost = current
+                output.insert(0, action)
+                current = parents[current]
+            return output
+
+        for child in problem.successorStates(state):
+            s, a, c = child
+
+            if s in reached:
+                x, y, old_cost = reached[s]
+            if s not in reached or c < old_cost:
+                reached[s] = child
+                frontier.push(child, c)
+                parents[child] = node
+    return None
 
 def aStarSearch(problem, heuristic):
     """
@@ -97,4 +132,34 @@ def aStarSearch(problem, heuristic):
     """
 
     # *** Your Code Here ***
-    raise NotImplementedError()
+    initial_cost = manhattan(problem.startingState(), problem)
+    initial_node = (problem.startingState(), "Stop", initial_cost)
+    node = initial_node
+    frontier = PriorityQueue()
+    frontier.push(node, initial_cost)
+    reached = {problem.startingState(): node}
+    parents = {node: None}
+
+    while not frontier.isEmpty():
+        node = frontier.pop()
+        state, action, cost = node
+        if problem.isGoal(state):
+            output = [action]
+            current = node
+            while parents[current] is not None:
+                state, action, cost = current
+                output.insert(0, action)
+                current = parents[current]
+            return output
+
+        for child in problem.successorStates(state):
+            s, a, c = child
+
+            if s in reached:
+                x, y, old_cost = reached[s]
+            if s not in reached or c < old_cost:
+                reached[s] = child
+                m = manhattan(s, problem)
+                frontier.push(child, c + m)
+                parents[child] = node
+    return None
