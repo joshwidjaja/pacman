@@ -19,7 +19,19 @@ def depthFirstSearch(problem):
     """
 
     # *** Your Code Here ***
-    raise NotImplementedError()
+    node = problem.startingState()
+    frontier = [node]
+    reached = {problem.startingState(): node}
+
+    while len(frontier) != 0:
+        node = frontier.pop(0)
+        if problem.isGoal(node): return node
+        for child in problem.successorStates(node):
+            s = child[0]
+            if s not in reached or child[2] < reached[s][2]:
+                reached[s] = child
+                frontier.append(child)
+    return None
 
 def breadthFirstSearch(problem):
     """
