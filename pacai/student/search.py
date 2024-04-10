@@ -26,7 +26,7 @@ def depthFirstSearch(problem):
     parents = {node: None}
 
     while len(frontier) != 0:
-        node = frontier.pop(0)
+        node = frontier.pop(-1)
         state, action, cost = node
         if problem.isGoal(state):
             output = [action]
@@ -61,7 +61,7 @@ def breadthFirstSearch(problem):
     parents = {node: None}
 
     while len(frontier) != 0:
-        node = frontier.pop(-1)
+        node = frontier.pop(0)
         state, action, cost = node
         if problem.isGoal(state):
             output = [action]
