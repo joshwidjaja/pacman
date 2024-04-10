@@ -19,18 +19,33 @@ def depthFirstSearch(problem):
     """
 
     # *** Your Code Here ***
-    node = problem.startingState()
+    initial_node = (problem.startingState(), "Stop", 0)
+    node = initial_node
     frontier = [node]
     reached = {problem.startingState(): node}
+    parents = {node: None}
 
     while len(frontier) != 0:
         node = frontier.pop(0)
-        if problem.isGoal(node): return node
-        for child in problem.successorStates(node):
-            s = child[0]
-            if s not in reached or child[2] < reached[s][2]:
+        state, action, cost = node
+        if problem.isGoal(state):
+            output = [action]
+            current = node
+            while parents[current] is not None:
+                state, action, cost = current
+                output.insert(0, action)
+                current = parents[current]
+            return output
+
+        for child in problem.successorStates(state):
+            s, a, c = child
+
+            if s in reached:
+                x, y, old_cost = reached[s]
+            if s not in reached or c < old_cost:
                 reached[s] = child
                 frontier.append(child)
+                parents[child] = node
     return None
 
 def breadthFirstSearch(problem):
