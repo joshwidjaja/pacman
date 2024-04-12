@@ -41,6 +41,7 @@ def depthFirstSearch(problem):
                 state, action, cost = current
                 output.insert(0, action)
                 current = parents[current]
+            output.pop(-1)
             return output
 
         for child in problem.successorStates(state):
@@ -48,7 +49,7 @@ def depthFirstSearch(problem):
 
             if s in reached:
                 x, y, old_cost = reached[s]
-            if s not in reached or c < old_cost:
+            if s not in reached:
                 reached[s] = child
                 frontier.push(child)
                 parents[child] = node
@@ -77,6 +78,7 @@ def breadthFirstSearch(problem):
                 state, action, cost = current
                 output.insert(0, action)
                 current = parents[current]
+            output.pop(-1)
             return output
 
         for child in problem.successorStates(state):
@@ -88,7 +90,7 @@ def breadthFirstSearch(problem):
                 reached[s] = child
                 frontier.push(child)
                 parents[child] = node
-    return None
+    return []
 
 def uniformCostSearch(problem):
     """
@@ -113,6 +115,7 @@ def uniformCostSearch(problem):
                 state, action, cost = current
                 output.insert(0, action)
                 current = parents[current]
+            output.pop(-1)
             return output
 
         for child in problem.successorStates(state):
@@ -150,6 +153,7 @@ def aStarSearch(problem, heuristic):
                 state, action, cost = current
                 output.insert(0, action)
                 current = parents[current]
+            output.pop(-1)
             return output
 
         for child in problem.successorStates(state):
