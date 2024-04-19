@@ -64,6 +64,7 @@ class CornersProblem(SearchProblem):
                 logging.warning('Warning: no food in corner ' + str(corner))
 
         # *** Your Code Here ***
+
         raise NotImplementedError()
 
     def actionsCost(self, actions):
@@ -84,6 +85,22 @@ class CornersProblem(SearchProblem):
                 return 999999
 
         return len(actions)
+    
+    def startingState(self):
+
+        pass
+
+    def isGoal(self, state):
+        if (0 in state[1]): 
+            return False
+        
+        self._visitedLocations.add(state)
+        coordinates = state[0]
+        self._visitHistory.append(coordinates)
+        return True
+
+    def successorStates(self, state):
+        pass
 
 def cornersHeuristic(state, problem):
     """
