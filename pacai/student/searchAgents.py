@@ -8,6 +8,7 @@ Good luck and happy searching!
 import logging
 
 from pacai.core.actions import Actions
+from pacai.core.directions import Directions
 from pacai.core.search import heuristic
 from pacai.core.search.position import PositionSearchProblem
 from pacai.core.search.problem import SearchProblem
@@ -64,8 +65,13 @@ class CornersProblem(SearchProblem):
                 logging.warning('Warning: no food in corner ' + str(corner))
 
         # *** Your Code Here ***
+        corner_list = (0, 0, 0, 0)
+        
+        self.startState = (self.startingPosition, corner_list)
 
-        raise NotImplementedError()
+        if self.startingPosition in self.corners:
+            self.startState = self.updateCorners(self.startState, self.startingPosition)
+
 
     def actionsCost(self, actions):
         """
@@ -87,20 +93,50 @@ class CornersProblem(SearchProblem):
         return len(actions)
     
     def startingState(self):
-
-        pass
+        return self.startState
 
     def isGoal(self, state):
-        if (0 in state[1]): 
+        position, corners = state
+        if 0 in corners: 
             return False
         
         self._visitedLocations.add(state)
-        coordinates = state[0]
+        coordinates, corners = state
         self._visitHistory.append(coordinates)
         return True
 
     def successorStates(self, state):
-        pass
+        successors = []
+
+        for action in Directions.CARDINAL:
+            (x, y), corners = state
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            hitsWall = self.walls[nextx][nexty]
+
+            if (not hitsWall):
+                # Construct the successor.
+                next_state = ((nextx, nexty), corners)
+                if (nextx, nexty) in self.corners:
+                    next_state = self.updateCorners(next_state, (nextx, nexty))
+                
+                cost = 1
+                successors.append((next_state, action, cost))
+
+        return successors
+    
+    def updateCorners(self, state, corner):
+        if corner not in self.corners:
+            return None
+        
+        output = state
+        position, corners = output
+        corner_list = list(corners)
+        for i in range(4):
+            if self.corners[i] == corner:
+                corner_list[i] = 1
+        corners = tuple(corner_list)
+        return (position, corners)
 
 def cornersHeuristic(state, problem):
     """
