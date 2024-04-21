@@ -135,8 +135,7 @@ class CornersProblem(SearchProblem):
         if corner not in self.corners:
             return None
         
-        output = state
-        position, corners = output
+        position, corners = state
         corner_list = list(corners)
         for i in range(4):
             if self.corners[i] == corner:
@@ -171,6 +170,7 @@ def cornersHeuristic(state, problem):
         if corner_tuple[i] == 0:
             corner_distances.append(distance.manhattan(position, corners[i]))
 
+    # somehow max distance expands less nodes than min??
     return max(corner_distances)
 
 def foodHeuristic(state, problem):
@@ -247,10 +247,6 @@ class ClosestDotSearchAgent(SearchAgent):
         # problem = AnyFoodSearchProblem(gameState)
 
         # *** Your Code Here ***
-        startPosition = gameState.getPacmanPosition()
-        food = gameState.getFood()
-        walls = gameState.getWalls()
-        problem = AnyFoodSearchProblem(gameState)
         raise NotImplementedError()
 
 class AnyFoodSearchProblem(PositionSearchProblem):
