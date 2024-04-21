@@ -158,19 +158,18 @@ def cornersHeuristic(state, problem):
     # walls = problem.walls  # These are the walls of the maze, as a Grid.
 
     # *** Your Code Here ***
-    position, corner_tuple = state
-    corners = problem.corners
-
     if problem.isGoal(state):
         return 0
+
+    position, corner_tuple = state
+    corners = problem.corners
     
     corner_distances = []
 
-    for i in range(len(corners)):
+    for i in range(4):
         if corner_tuple[i] == 0:
             corner_distances.append(distance.manhattan(position, corners[i]))
 
-    # somehow max distance expands less nodes than min??
     return max(corner_distances)
 
 def foodHeuristic(state, problem):
@@ -205,7 +204,15 @@ def foodHeuristic(state, problem):
     position, foodGrid = state
 
     # *** Your Code Here ***
-    return heuristic.null(state, problem)  # Default to the null heuristic.
+    if problem.isGoal(state):
+        return 0
+    
+    food_distances = []
+    foodList = foodGrid.asList()
+    for food in foodList:
+        food_distances.append(distance.manhatta(position, food))
+
+    return max(food_distances)
 
 class ClosestDotSearchAgent(SearchAgent):
     """
