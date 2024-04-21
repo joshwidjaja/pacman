@@ -10,11 +10,11 @@ import logging
 from pacai.core.actions import Actions
 from pacai.core.directions import Directions
 from pacai.core import distance
-from pacai.core.search import heuristic
 from pacai.core.search.position import PositionSearchProblem
 from pacai.core.search.problem import SearchProblem
 from pacai.agents.base import BaseAgent
 from pacai.agents.search.base import SearchAgent
+from pacai.student import search
 
 class CornersProblem(SearchProblem):
     """
@@ -210,7 +210,7 @@ def foodHeuristic(state, problem):
     food_distances = []
     foodList = foodGrid.asList()
     for food in foodList:
-        food_distances.append(distance.manhatta(position, food))
+        food_distances.append(distance.manhattan(position, food))
 
     return max(food_distances)
 
@@ -254,7 +254,8 @@ class ClosestDotSearchAgent(SearchAgent):
         # problem = AnyFoodSearchProblem(gameState)
 
         # *** Your Code Here ***
-        raise NotImplementedError()
+        problem = AnyFoodSearchProblem(gameState)
+        return search.uniformCostSearch(problem)
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -282,6 +283,14 @@ class AnyFoodSearchProblem(PositionSearchProblem):
 
         # Store the food for later reference.
         self.food = gameState.getFood()
+
+    def isGoal(self, state):
+        foodList = self.food.asList()
+
+        if state in foodList:
+            return True
+        
+        return False
 
 class ApproximateSearchAgent(BaseAgent):
     """
