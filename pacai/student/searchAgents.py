@@ -159,7 +159,6 @@ class CornersProblem(SearchProblem):
                 corner_dict[self.corners[i]] = distance.euclidean(position, self.corners[i])
 
         output = min(corner_dict, key=corner_dict.get)
-        print(corner_dict)
         return output
 
 def cornersHeuristic(state, problem):
@@ -178,7 +177,7 @@ def cornersHeuristic(state, problem):
 
     # *** Your Code Here ***
     position, corner_tuple = state
-    return heuristic.euclidean(position, problem)
+    return heuristic.manhattan(position, problem)
 
 def foodHeuristic(state, problem):
     """
@@ -254,6 +253,10 @@ class ClosestDotSearchAgent(SearchAgent):
         # problem = AnyFoodSearchProblem(gameState)
 
         # *** Your Code Here ***
+        startPosition = gameState.getPacmanPosition()
+        food = gameState.getFood()
+        walls = gameState.getWalls()
+        problem = AnyFoodSearchProblem(gameState)
         raise NotImplementedError()
 
 class AnyFoodSearchProblem(PositionSearchProblem):

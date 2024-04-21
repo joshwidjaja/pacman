@@ -5,7 +5,6 @@ In this file, you will implement generic search algorithms which are called by P
 from pacai.util.queue import Queue
 from pacai.util.stack import Stack
 from pacai.util.priorityQueue import PriorityQueue
-from pacai.core.search.heuristic import euclidean
 
 def depthFirstSearch(problem):
     """
@@ -24,36 +23,23 @@ def depthFirstSearch(problem):
     """
 
     # *** Your Code Here ***
-    initial_node = (problem.startingState(), "Stop", 0)
-    node = initial_node
-    frontier = Stack()
-    frontier.push(node)
-    reached = {problem.startingState(): node}
-    parents = {node: None}
+    node_queue = Stack()
+    start_node = problem.startingState()
+    visited = [start_node]
+    node_queue.push((start_node, []))
 
-    while not frontier.isEmpty():
-        node = frontier.pop()
-        state, action, cost = node
-        if problem.isGoal(state):
-            output = [action]
-            current = node
-            while parents[current] is not None:
-                state, action, cost = current
-                output.insert(0, action)
-                current = parents[current]
-            output.pop(-1)
-            return output
+    while not node_queue.isEmpty():
+        current_node, path = node_queue.pop()
 
-        for child in problem.successorStates(state):
-            s, a, c = child
+        if problem.isGoal(current_node):
+            return path
+        
+        for child in problem.successorStates(current_node):
+            successor, action, cost = child
 
-            if s in reached:
-                x, y, old_cost = reached[s]
-            if s not in reached:
-                reached[s] = child
-                frontier.push(child)
-                parents[child] = node
-    return None
+            if successor not in visited:
+                visited.append(successor)
+                node_queue.push((successor, path + [action]))
 
 def breadthFirstSearch(problem):
     """
@@ -61,35 +47,24 @@ def breadthFirstSearch(problem):
     """
 
     # *** Your Code Here ***
-    initial_node = (problem.startingState(), "Stop", 0)
-    node = initial_node
-    frontier = Queue()
-    frontier.push(node)
-    reached = {problem.startingState(): node}
-    parents = {node: None}
+    node_queue = Queue()
+    start_node = problem.startingState()
+    visited = [start_node]
+    node_queue.push((start_node, []))
 
-    while not frontier.isEmpty():
-        node = frontier.pop()
-        state, action, cost = node
-        if problem.isGoal(state):
-            output = [action]
-            current = node
-            while parents[current] is not None:
-                state, action, cost = current
-                output.insert(0, action)
-                current = parents[current]
-            output.pop(-1)
-            return output
+    while not node_queue.isEmpty():
+        current_node, path = node_queue.pop()
 
-        for child in problem.successorStates(state):
-            s, a, c = child
+        if problem.isGoal(current_node):
+            return path
+        
+        for child in problem.successorStates(current_node):
+            successor, action, cost = child
 
-            if s in reached:
-                x, y, old_cost = reached[s]
-            if s not in reached or c < old_cost:
-                reached[s] = child
-                frontier.push(child)
-                parents[child] = node
+            if successor not in visited:
+                visited.append(successor)
+                node_queue.push((successor, path + [action]))
+    
     return []
 
 def uniformCostSearch(problem):
@@ -98,36 +73,26 @@ def uniformCostSearch(problem):
     """
 
     # *** Your Code Here ***
-    initial_node = (problem.startingState(), "Stop", 0)
-    node = initial_node
-    frontier = PriorityQueue()
-    frontier.push(node, 0)
-    reached = {problem.startingState(): node}
-    parents = {node: None}
+    node_queue = PriorityQueue()
+    start_node = problem.startingState()
+    visited = [start_node]
+    node_queue.push((start_node, []), 0)
 
-    while not frontier.isEmpty():
-        node = frontier.pop()
-        state, action, cost = node
-        if problem.isGoal(state):
-            output = [action]
-            current = node
-            while parents[current] is not None:
-                state, action, cost = current
-                output.insert(0, action)
-                current = parents[current]
-            output.pop(-1)
-            return output
+    while not node_queue.isEmpty():
+        current_node, path = node_queue.pop()
 
-        for child in problem.successorStates(state):
-            s, a, c = child
+        if problem.isGoal(current_node):
+            return path
+        
+        for child in problem.successorStates(current_node):
+            successor, action, cost = child
 
-            if s in reached:
-                x, y, old_cost = reached[s]
-            if s not in reached or c < old_cost:
-                reached[s] = child
-                frontier.push(child, c)
-                parents[child] = node
-    return None
+            if successor not in visited:
+                visited.append(successor)
+                new_cost = problem.actionsCost(path + [action])
+                node_queue.push((successor, path + [action]), new_cost)
+    
+    return []
 
 def aStarSearch(problem, heuristic):
     """
@@ -135,41 +100,24 @@ def aStarSearch(problem, heuristic):
     """
 
     # *** Your Code Here ***
-    if type(problem.startingState()[0]) is tuple:
-        initial_cost = euclidean(problem.startingState()[0], problem)
-    else:
-        initial_cost = euclidean(problem.startingState(), problem)
-    initial_node = (problem.startingState(), "Stop", initial_cost)
-    node = initial_node
-    frontier = PriorityQueue()
-    frontier.push(node, initial_cost)
-    reached = {problem.startingState(): node}
-    parents = {node: None}
+    # Assistance from Tutor Chloe Wong
+    node_queue = PriorityQueue()
+    start_node = problem.startingState()
+    visited = [start_node]
+    node_queue.push((start_node, []), 0)
 
-    while not frontier.isEmpty():
-        node = frontier.pop()
-        state, action, cost = node
-        if problem.isGoal(state):
-            output = [action]
-            current = node
-            while parents[current] is not None:
-                state, action, cost = current
-                output.insert(0, action)
-                current = parents[current]
-            output.pop(-1)
-            return output
+    while not node_queue.isEmpty():
+        current_node, path = node_queue.pop()
 
-        for child in problem.successorStates(state):
-            s, a, c = child
+        if problem.isGoal(current_node):
+            return path
+        
+        for child in problem.successorStates(current_node):
+            successor, action, cost = child
 
-            if s in reached:
-                x, y, old_cost = reached[s]
-            if s not in reached or c < old_cost:
-                reached[s] = child
-                if type(s[0]) is tuple:
-                    m = euclidean(s[0], problem)
-                else:
-                    m = euclidean(s, problem)
-                frontier.push(child, c + m)
-                parents[child] = node
-    return None
+            if successor not in visited:
+                visited.append(successor)
+                new_cost = problem.actionsCost(path + [action]) + heuristic(successor, problem)
+                node_queue.push((successor, path + [action]), new_cost)
+
+    return []
