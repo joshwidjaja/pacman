@@ -5,7 +5,7 @@ In this file, you will implement generic search algorithms which are called by P
 from pacai.util.queue import Queue
 from pacai.util.stack import Stack
 from pacai.util.priorityQueue import PriorityQueue
-from pacai.core.search.heuristic import manhattan
+from pacai.core.search.heuristic import euclidean
 
 def depthFirstSearch(problem):
     """
@@ -135,7 +135,10 @@ def aStarSearch(problem, heuristic):
     """
 
     # *** Your Code Here ***
-    initial_cost = manhattan(problem.startingState(), problem)
+    if type(problem.startingState()[0]) is tuple:
+        initial_cost = euclidean(problem.startingState()[0], problem)
+    else:
+        initial_cost = euclidean(problem.startingState(), problem)
     initial_node = (problem.startingState(), "Stop", initial_cost)
     node = initial_node
     frontier = PriorityQueue()
@@ -163,7 +166,10 @@ def aStarSearch(problem, heuristic):
                 x, y, old_cost = reached[s]
             if s not in reached or c < old_cost:
                 reached[s] = child
-                m = manhattan(s, problem)
+                if type(s[0]) is tuple:
+                    m = euclidean(s[0], problem)
+                else:
+                    m = euclidean(s, problem)
                 frontier.push(child, c + m)
                 parents[child] = node
     return None

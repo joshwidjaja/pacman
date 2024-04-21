@@ -9,6 +9,7 @@ import logging
 
 from pacai.core.actions import Actions
 from pacai.core.directions import Directions
+from pacai.core import distance
 from pacai.core.search import heuristic
 from pacai.core.search.position import PositionSearchProblem
 from pacai.core.search.problem import SearchProblem
@@ -72,6 +73,8 @@ class CornersProblem(SearchProblem):
         if self.startingPosition in self.corners:
             self.startState = self.updateCorners(self.startState, self.startingPosition)
 
+        self.goal = (0, 0)
+        self.goal = self.updateGoal(self.startState)
 
     def actionsCost(self, actions):
         """
@@ -97,7 +100,7 @@ class CornersProblem(SearchProblem):
 
     def isGoal(self, state):
         position, corners = state
-        if 0 in corners: 
+        if 0 in corners:
             return False
         
         self._visitedLocations.add(state)
@@ -123,6 +126,12 @@ class CornersProblem(SearchProblem):
                 cost = 1
                 successors.append((next_state, action, cost))
 
+        self._numExpanded += 1
+        if (state not in self._visitedLocations):
+            self._visitedLocations.add(state)
+            coordinates, corners = state
+            self._visitHistory.append(coordinates)
+
         return successors
     
     def updateCorners(self, state, corner):
@@ -136,7 +145,22 @@ class CornersProblem(SearchProblem):
             if self.corners[i] == corner:
                 corner_list[i] = 1
         corners = tuple(corner_list)
+        self.goal = self.updateGoal(state)
         return (position, corners)
+    
+    def updateGoal(self, state):
+        output = self.goal
+        position, corners = state
+        corner_list = list(corners)
+        corner_dict = {}
+        
+        for i in range(4):
+            if corner_list[i] == 0:
+                corner_dict[self.corners[i]] = distance.euclidean(position, self.corners[i])
+
+        output = min(corner_dict, key=corner_dict.get)
+        print(corner_dict)
+        return output
 
 def cornersHeuristic(state, problem):
     """
@@ -153,7 +177,8 @@ def cornersHeuristic(state, problem):
     # walls = problem.walls  # These are the walls of the maze, as a Grid.
 
     # *** Your Code Here ***
-    return heuristic.null(state, problem)  # Default to trivial solution
+    position, corner_tuple = state
+    return heuristic.euclidean(position, problem)
 
 def foodHeuristic(state, problem):
     """
