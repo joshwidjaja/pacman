@@ -73,9 +73,6 @@ class CornersProblem(SearchProblem):
         if self.startingPosition in self.corners:
             self.startState = self.updateCorners(self.startState, self.startingPosition)
 
-        self.goal = (0, 0)
-        self.goal = self.updateGoal(self.startState)
-
     def actionsCost(self, actions):
         """
         Returns the cost of a particular sequence of actions.
@@ -145,21 +142,7 @@ class CornersProblem(SearchProblem):
             if self.corners[i] == corner:
                 corner_list[i] = 1
         corners = tuple(corner_list)
-        self.goal = self.updateGoal(state)
         return (position, corners)
-    
-    def updateGoal(self, state):
-        output = self.goal
-        position, corners = state
-        corner_list = list(corners)
-        corner_dict = {}
-        
-        for i in range(4):
-            if corner_list[i] == 0:
-                corner_dict[self.corners[i]] = distance.euclidean(position, self.corners[i])
-
-        output = min(corner_dict, key=corner_dict.get)
-        return output
 
 def cornersHeuristic(state, problem):
     """
@@ -177,7 +160,18 @@ def cornersHeuristic(state, problem):
 
     # *** Your Code Here ***
     position, corner_tuple = state
-    return heuristic.manhattan(position, problem)
+    corners = problem.corners
+
+    if problem.isGoal(state):
+        return 0
+    
+    corner_distances = []
+
+    for i in range(len(corners)):
+        if corner_tuple[i] == 0:
+            corner_distances.append(distance.manhattan(position, corners[i]))
+
+    return max(corner_distances)
 
 def foodHeuristic(state, problem):
     """
