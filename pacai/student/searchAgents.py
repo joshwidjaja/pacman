@@ -210,9 +210,25 @@ def foodHeuristic(state, problem):
     food_distances = []
     foodList = foodGrid.asList()
     for food in foodList:
-        food_distances.append(distance.manhattan(position, food))
+        food_distances.append(mazeDistance(position, food, problem.startingGameState))
 
     return max(food_distances)
+
+# gets manhattan distance in maze that accounts for walls
+def mazeDistance(pos1, pos2, state):
+    walls = state.getWalls()
+    x1, y1 = pos1
+    x2, y2 = pos2
+
+    if walls[x1][y1]:
+        print(str(pos1) + " is a wall")
+        return None
+    elif walls[x2][y2]:
+        print(str(pos2) + " is a wall")
+        return None
+    
+    problem = PositionSearchProblem(state, start=pos1, goal=pos2)
+    return len(search.breadthFirstSearch(problem))
 
 class ClosestDotSearchAgent(SearchAgent):
     """
