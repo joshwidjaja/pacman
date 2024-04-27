@@ -2,6 +2,7 @@ import random
 
 from pacai.agents.base import BaseAgent
 from pacai.agents.search.multiagent import MultiAgentSearchAgent
+from pacai.core import distance
 
 class ReflexAgent(BaseAgent):
     """
@@ -57,8 +58,23 @@ class ReflexAgent(BaseAgent):
         # newScaredTimes = [ghostState.getScaredTimer() for ghostState in newGhostStates]
 
         # *** Your Code Here ***
+        newPosition = successorGameState.getPacmanPosition()
+        oldFood = currentGameState.getFood().asList()
 
-        return successorGameState.getScore()
+        for ghost in successorGameState.getGhostPositions():
+            # abandon route if ghost is too close
+            if distance.manhattan(newPosition, ghost) < 2:
+                return -float("inf")
+
+        # uses closest distance to food and its reciprocal
+        closestFoodDistance = float("inf")
+        for food in oldFood:
+            foodDistance = distance.manhattan(newPosition, food)
+            if foodDistance <= closestFoodDistance: 
+                closestFoodDistance = foodDistance
+
+        distanceScore = 1.0/closestFoodDistance if closestFoodDistance > 0 else float("inf")
+        return successorGameState.getScore() + distanceScore
 
 class MinimaxAgent(MultiAgentSearchAgent):
     """
