@@ -70,10 +70,10 @@ class ReflexAgent(BaseAgent):
         closestFoodDistance = float("inf")
         for food in oldFood:
             foodDistance = distance.manhattan(newPosition, food)
-            if foodDistance <= closestFoodDistance: 
+            if foodDistance <= closestFoodDistance:
                 closestFoodDistance = foodDistance
 
-        distanceScore = 1.0/closestFoodDistance if closestFoodDistance > 0 else float("inf")
+        distanceScore = 1.0 / closestFoodDistance if closestFoodDistance > 0 else float("inf")
         return successorGameState.getScore() + distanceScore
 
 class MinimaxAgent(MultiAgentSearchAgent):
