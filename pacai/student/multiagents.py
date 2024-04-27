@@ -81,16 +81,8 @@ class ReflexAgent(BaseAgent):
             if foodDistance <= closestFoodDistance:
                 closestFoodDistance = foodDistance
 
-        # capsules are similar, but give more weight to them
-        closestCapsuleDistance = float("inf")
-        for capsule in newCapsules:
-            capsuleDistance = distance.manhattan(newPosition, capsule)
-            if capsuleDistance <= closestCapsuleDistance:
-                closestCapsuleDistance = capsuleDistance
-
         foodDistanceScore = 1.0 / closestFoodDistance if closestFoodDistance > 0 else float("inf")
-        capsuleDistanceScore = 1.0 / closestCapsuleDistance if closestCapsuleDistance > 0 else float("inf")
-        return successorGameState.getScore() + foodDistanceScore + (2 * capsuleDistanceScore)
+        return successorGameState.getScore() + foodDistanceScore
 
 class MinimaxAgent(MultiAgentSearchAgent):
     """
