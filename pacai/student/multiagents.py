@@ -59,7 +59,15 @@ class ReflexAgent(BaseAgent):
 
         # *** Your Code Here ***
         newPosition = successorGameState.getPacmanPosition()
-        oldFood = currentGameState.getFood().asList()
+        newFood = successorGameState.getFood().asList()
+        newCapsules = successorGameState.getCapsules()
+
+        if successorGameState.isWin():
+            return float("inf")  # pursue win state
+
+        # do NOT stop
+        if action == "STOP":
+            return -float("inf")
 
         for ghost in successorGameState.getGhostPositions():
             # abandon route if ghost is too close
@@ -68,13 +76,21 @@ class ReflexAgent(BaseAgent):
 
         # uses closest distance to food and its reciprocal
         closestFoodDistance = float("inf")
-        for food in oldFood:
+        for food in newFood:
             foodDistance = distance.manhattan(newPosition, food)
             if foodDistance <= closestFoodDistance:
                 closestFoodDistance = foodDistance
 
-        distanceScore = 1.0 / closestFoodDistance if closestFoodDistance > 0 else float("inf")
-        return successorGameState.getScore() + distanceScore
+        # capsules are similar, but give more weight to them
+        closestCapsuleDistance = float("inf")
+        for capsule in newCapsules:
+            capsuleDistance = distance.manhattan(newPosition, capsule)
+            if capsuleDistance <= closestCapsuleDistance:
+                closestCapsuleDistance = capsuleDistance
+
+        foodDistanceScore = 1.0 / closestFoodDistance if closestFoodDistance > 0 else float("inf")
+        capsuleDistanceScore = 1.0 / closestCapsuleDistance if closestCapsuleDistance > 0 else float("inf")
+        return successorGameState.getScore() + foodDistanceScore + (2 * capsuleDistanceScore)
 
 class MinimaxAgent(MultiAgentSearchAgent):
     """
@@ -105,6 +121,25 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
     def __init__(self, index, **kwargs):
         super().__init__(index, **kwargs)
+
+    def getAction(self, state):
+        return
+        legal_actions = state.getLegalActions(0)
+        max_value = -float("inf")
+        best_action = None
+
+        for action in legal_actions:
+            pass
+        
+        return best_action
+
+    # for pacman
+    def maxValue(self, state, depth):
+        pass
+
+    # for ghosts
+    def minValue(self, state, agent, depth):
+        pass
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
