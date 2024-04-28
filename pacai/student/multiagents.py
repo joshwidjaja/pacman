@@ -3,6 +3,7 @@ import random
 from pacai.agents.base import BaseAgent
 from pacai.agents.search.multiagent import MultiAgentSearchAgent
 from pacai.core import distance
+from pacai.core.directions import Directions
 
 class ReflexAgent(BaseAgent):
     """
@@ -60,13 +61,12 @@ class ReflexAgent(BaseAgent):
         # *** Your Code Here ***
         newPosition = successorGameState.getPacmanPosition()
         newFood = successorGameState.getFood().asList()
-        newCapsules = successorGameState.getCapsules()
 
         if successorGameState.isWin():
             return float("inf")  # pursue win state
 
         # do NOT stop
-        if action == "STOP":
+        if action == Directions.STOP:
             return -float("inf")
 
         for ghost in successorGameState.getGhostPositions():
@@ -115,23 +115,61 @@ class MinimaxAgent(MultiAgentSearchAgent):
         super().__init__(index, **kwargs)
 
     def getAction(self, state):
-        return
-        legal_actions = state.getLegalActions(0)
-        max_value = -float("inf")
-        best_action = None
+        # final action from pacman max
+        score, action = self.minimax(state, 0, self.getTreeDepth())
+        return action
 
-        for action in legal_actions:
-            pass
-        
-        return best_action
+    def minimax(self, state, agent, depth):
+        # return raw score at terminal state or max depth
+        if depth == 0 or state.isLose() or state.isWin():
+            return self.getEvaluationFunction()(state), Directions.STOP
+        elif agent == 0:  # pacman
+            return self.maxValue(state, depth)
+        else:
+            return self.minValue(state, agent, depth)
 
     # for pacman
     def maxValue(self, state, depth):
-        pass
+        actions = state.getLegalActions(0)
+        max_score = -float("inf")
+        max_action = Directions.STOP
+
+        for action in actions:
+            # Don't consider stopping in the search
+            if action == Directions.STOP:
+                continue
+            successor = state.generateSuccessor(0, action)
+            # gets minimax from next ghost
+            action_score, new_action = self.minimax(successor, 1, depth)
+            if action_score > max_score:
+                max_score = action_score
+                max_action = action
+        return max_score, max_action
 
     # for ghosts
     def minValue(self, state, agent, depth):
-        pass
+        actions = state.getLegalActions(agent)
+        min_score = float("inf")
+        min_action = Directions.STOP
+
+        # move back to pacman if at the last ghost
+        if agent == state.getNumAgents() - 1:
+            new_agent = 0
+            new_depth = depth - 1
+        else:
+            new_agent = agent + 1
+            new_depth = depth
+
+        for action in actions:
+            if action == Directions.STOP:
+                continue
+            successor = state.generateSuccessor(agent, action)
+            # gets minimax from pacman/next ghost
+            action_score, new_action = self.minimax(successor, new_agent, new_depth)
+            if action_score < min_score:
+                min_score = action_score
+                min_action = action
+        return min_score, min_action
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
