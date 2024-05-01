@@ -186,6 +186,77 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     def __init__(self, index, **kwargs):
         super().__init__(index, **kwargs)
 
+    def getAction(self, state):
+        alpha, beta = -float("inf"), float("inf")
+        score, action = self.alphaBeta(state, 0, 0, self.getTreeDepth(), alpha, beta)
+        return action
+    
+    def alphaBeta(self, state, agent, depth, alpha, beta):
+        if depth == 0 or state.isLose() or state.isWin():
+            return self.getEvaluationFunction()(state), Directions.STOP
+        elif agent == 0:
+            return self.alphaValue(state, depth, alpha, beta)
+        else:
+            return self.betaValue(state, agent, depth, alpha, beta)
+        
+    def alphaValue(self, state, depth, alpha, beta):
+        actions = state.getLegalActions(0)
+        max_score = -float("inf")
+        max_action = Directions.STOP
+
+        for action in actions:
+            # Don't consider stopping in the search
+            if action == Directions.STOP:
+                continue
+            successor = state.generateSuccessor(0, action)
+            # gets minimax from next ghost
+            action_score, new_action = self.alphaBeta(successor, 1, depth, alpha, beta)
+            if action_score > max_score:
+                max_score = action_score
+                max_action = action
+
+            # prune if max exceeds beta
+            if max_score > beta:
+                return max_score, max_action
+
+            # update alpha
+            if max_score > alpha:
+                alpha = max_score
+
+        return max_score, max_action
+
+    def betaValue(self, state, agent, depth, alpha, beta):
+        actions = state.getLegalActions(agent)
+        min_score = float("inf")
+        min_action = Directions.STOP
+
+        # move back to pacman if at the last ghost
+        if agent == state.getNumAgents() - 1:
+            new_agent = 0
+            new_depth = depth - 1
+        else:
+            new_agent = agent + 1
+            new_depth = depth
+
+        for action in actions:
+            if action == Directions.STOP:
+                continue
+            successor = state.generateSuccessor(agent, action)
+            # gets minimax from pacman/next ghost
+            action_score, new_action = self.alphaBeta(successor, new_agent, new_depth, alpha, beta)
+            if action_score < min_score:
+                min_score = action_score
+                min_action = action
+
+            # prune if min is below alpha
+            if min_score < alpha:
+                return min_score, min_action
+            
+            # update beta
+            if min_score < beta:
+                beta = min_score
+        return min_score, min_action
+
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
     An expectimax agent.
