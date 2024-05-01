@@ -187,8 +187,9 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         super().__init__(index, **kwargs)
 
     def getAction(self, state):
-        alpha, beta = -float("inf"), float("inf")
-        score, action = self.alphaBeta(state, 0, 0, self.getTreeDepth(), alpha, beta)
+        alpha = -float("inf")
+        beta = float("inf")
+        score, action = self.alphaBeta(state, 0, self.getTreeDepth(), alpha, beta)
         return action
     
     def alphaBeta(self, state, agent, depth, alpha, beta):
