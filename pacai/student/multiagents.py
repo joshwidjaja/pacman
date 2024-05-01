@@ -210,7 +210,6 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             if action == Directions.STOP:
                 continue
             successor = state.generateSuccessor(0, action)
-            # gets minimax from next ghost
             action_score, new_action = self.alphaBeta(successor, 1, depth, alpha, beta)
             if action_score > max_score:
                 max_score = action_score
@@ -243,7 +242,6 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             if action == Directions.STOP:
                 continue
             successor = state.generateSuccessor(agent, action)
-            # gets minimax from pacman/next ghost
             action_score, new_action = self.alphaBeta(successor, new_agent, new_depth, alpha, beta)
             if action_score < min_score:
                 min_score = action_score
@@ -274,6 +272,57 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
 
     def __init__(self, index, **kwargs):
         super().__init__(index, **kwargs)
+
+    def getAction(self, state):
+        score, action = self.expectimax(state, 0, self.getTreeDepth())
+        return action
+    
+    def expectimax(self, state, agent, depth):
+        if depth == 0 or state.isLose() or state.isWin():
+            return self.getEvaluationFunction()(state), Directions.STOP
+        elif agent == 0:
+            return self.maxValue(state, depth)
+        else:
+            return self.expectedValue(state, agent, depth)
+        
+    def maxValue(self, state, depth):
+        actions = state.getLegalActions(0)
+        max_score = -float("inf")
+        max_action = Directions.STOP
+
+        for action in actions:
+            # Don't consider stopping in the search
+            if action == Directions.STOP:
+                continue
+            successor = state.generateSuccessor(0, action)
+            action_score, new_action = self.expectimax(successor, 1, depth)
+            if action_score > max_score:
+                max_score = action_score
+                max_action = action
+        return max_score, max_action
+
+    def expectedValue(self, state, agent, depth):
+        actions = state.getLegalActions(agent)
+        expected_score = 0
+        expected_action = Directions.STOP
+        probability = 1.0 / len(actions)
+
+        if agent == state.getNumAgents() - 1:
+            new_agent = 0
+            new_depth = depth - 1
+        else:
+            new_agent = agent + 1
+            new_depth = depth
+
+        for action in actions:
+            if action == Directions.STOP:
+                continue
+
+            successor = state.generateSuccessor(agent, action)
+            action_score, new_action = self.expectimax(successor, new_agent, new_depth)
+
+            expected_score += probability * action_score
+        return expected_score, expected_action
 
 def betterEvaluationFunction(currentGameState):
     """
