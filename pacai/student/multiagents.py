@@ -330,8 +330,40 @@ def betterEvaluationFunction(currentGameState):
 
     DESCRIPTION: <write something here so we know what you did>
     """
+    # Don't lose, simple as
+    if currentGameState.isWin():
+        return float("inf")
+    elif currentGameState.isLose():
+        return -float("inf")
+    
+    score = currentGameState.getScore()
+    
+    pos = currentGameState.getPacmanPosition()
+    ghosts = currentGameState.getGhostStates()
 
-    return currentGameState.getScore()
+    # avoid ghosts (only if they aren't scared)
+    brave_ghosts = []
+    for ghost in ghosts:
+        if ghost.getScaredTimer() <= 0:
+            brave_ghosts.append(ghost)
+
+    for ghost in brave_ghosts:
+        # abandon route if ghost is too close
+        if distance.manhattan(pos, ghost.getPosition()) < 2:
+            return -float("inf")
+    # get food
+    food_list = currentGameState.getFood().asList()
+    food_left = len(food_list)
+
+    food_distances = []
+    for food in food_list:
+        food_distances.append(distance.manhattan(pos, food))
+
+    closest_food_distance = min(food_distances)
+    # get capsules
+    capsules_left = len(currentGameState.getCapsules())
+    output = score - (2 * closest_food_distance) - (4 * food_left) - (16 * capsules_left)
+    return output
 
 class ContestAgent(MultiAgentSearchAgent):
     """
