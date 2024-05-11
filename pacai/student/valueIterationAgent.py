@@ -65,8 +65,11 @@ class ValueIterationAgent(ValueEstimationAgent):
         for next_state, prob in transitions:
             reward = self.mdp.getReward(state, action, next_state)
             # q-value formula
-            sum += prob * (reward + (self.discount * self.getValue(next_state)))
+            sum += prob * (reward + (self.discountRate * self.getValue(next_state)))
         return sum
+    
+    def getAction(self, state):
+        return self.getPolicy(state)
     
     def getPolicy(self, state):
         """
@@ -82,6 +85,6 @@ class ValueIterationAgent(ValueEstimationAgent):
         for action in actions:
             action_values[action] = self.getQValue(state, action)
 
-        best_action = max(action_values, key=action_values.get())
+        best_action = max(action_values, key=action_values.get)
 
         return best_action
