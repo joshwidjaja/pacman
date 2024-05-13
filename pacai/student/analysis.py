@@ -11,11 +11,11 @@ NOT_POSSIBLE = None
 
 def question2():
     """
-    [Enter a description of what you did here.]
+    Reduced noise to prevent excessive deviation
     """
 
     answerDiscount = 0.9
-    answerNoise = 0.2
+    answerNoise = 0.01
 
     return answerDiscount, answerNoise
 
