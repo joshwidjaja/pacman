@@ -21,21 +21,21 @@ def question2():
 
 def question3a():
     """
-    [Enter a description of what you did here.]
+    low living reward encourages an early exit
     """
 
     answerDiscount = 0.9
     answerNoise = 0.2
-    answerLivingReward = 0.0
+    answerLivingReward = -4.0
 
     return answerDiscount, answerNoise, answerLivingReward
 
 def question3b():
     """
-    [Enter a description of what you did here.]
+    reducing the discount makes taking a longer route also favorable
     """
 
-    answerDiscount = 0.9
+    answerDiscount = 0.2
     answerNoise = 0.2
     answerLivingReward = 0.0
 
@@ -43,18 +43,18 @@ def question3b():
 
 def question3c():
     """
-    [Enter a description of what you did here.]
+    living reward is harsher than 3d, but less harsh than 3a
     """
 
     answerDiscount = 0.9
     answerNoise = 0.2
-    answerLivingReward = 0.0
+    answerLivingReward = -1.0
 
     return answerDiscount, answerNoise, answerLivingReward
 
 def question3d():
     """
-    [Enter a description of what you did here.]
+    No changes necessary, path preferred by default
     """
 
     answerDiscount = 0.9
@@ -65,12 +65,12 @@ def question3d():
 
 def question3e():
     """
-    [Enter a description of what you did here.]
+    made the reward positive to disincentivize the actual goals
     """
 
     answerDiscount = 0.9
     answerNoise = 0.2
-    answerLivingReward = 0.0
+    answerLivingReward = 10
 
     return answerDiscount, answerNoise, answerLivingReward
 
