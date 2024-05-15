@@ -64,8 +64,9 @@ class ValueIterationAgent(ValueEstimationAgent):
 
         for next_state, prob in transitions:
             reward = self.mdp.getReward(state, action, next_state)
-            # q-value formula
-            sum += prob * (reward + (self.discountRate * self.getValue(next_state)))
+            next_value = self.discountRate * self.getValue(next_state)
+            # bellman equation
+            sum += prob * (reward + next_value)
         return sum
     
     def getAction(self, state):
