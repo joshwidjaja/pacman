@@ -79,10 +79,10 @@ def question6():
     [Enter a description of what you did here.]
     """
 
-    answerEpsilon = 0.3
-    answerLearningRate = 0.5
+    # answerEpsilon = 0.3
+    # answerLearningRate = 0.5
 
-    return answerEpsilon, answerLearningRate
+    return NOT_POSSIBLE
 
 if __name__ == '__main__':
     questions = [
