@@ -178,6 +178,7 @@ class ApproximateQAgent(PacmanQAgent):
     Should update your weights based on transition.
 
     DESCRIPTION: <Write something here so we know what you did.>
+    used getFeatures from IdentityExtractor
     """
 
     def __init__(self, index,
@@ -186,6 +187,29 @@ class ApproximateQAgent(PacmanQAgent):
         self.featExtractor = reflection.qualifiedImport(extractor)
 
         # You might want to initialize weights here.
+        self.weights = {}
+
+    # https://stackoverflow.com/a/33079563
+    def dotProduct(self, a, b):
+        return sum(a[key] * b.get(key, 0) for key in a)
+
+    def getQValue(self, state, action):
+        featureVector = self.featExtractor.getFeatures(self, state, action)
+        return self.dotProduct(featureVector, self.weights)
+    
+    def update(self, state, action, nextState, reward):
+        # update based on formula in p3 documentation
+        former_value = self.getQValue(state, action)
+        next_value = self.getValue(nextState)
+        correction = (reward + self.getDiscountRate() * next_value) - former_value
+        
+        featureVector = self.featExtractor.getFeatures(self, state, action)
+        for feature in featureVector:
+            weight = self.getAlpha() * correction * featureVector[feature]
+            if feature in self.weights:
+                self.weights[feature] += weight
+            else:
+                self.weights[feature] = weight
 
     def final(self, state):
         """
@@ -199,4 +223,4 @@ class ApproximateQAgent(PacmanQAgent):
         if self.episodesSoFar == self.numTraining:
             # You might want to print your weights here for debugging.
             # *** Your Code Here ***
-            raise NotImplementedError()
+            print(self.weights)
